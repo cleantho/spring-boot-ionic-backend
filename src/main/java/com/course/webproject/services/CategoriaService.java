@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.course.webproject.domain.Categoria;
+import com.course.webproject.dto.CategoriaDTO;
 import com.course.webproject.repositories.CategoriaRepository;
 import com.course.webproject.services.exceptions.DataIntegrityException;
 import com.course.webproject.services.exceptions.ObjectNotFoundException;
@@ -57,5 +58,9 @@ public class CategoriaService {
 		} catch(DataIntegrityViolationException e) {
 			throw new DataIntegrityException("Não é possível excluir um Categoria com produtos associados.");
 		}
+	}
+	
+	public Categoria fromDTO(CategoriaDTO objDto) {
+		return new Categoria(objDto.getId(), objDto.getNome());
 	}
 }
