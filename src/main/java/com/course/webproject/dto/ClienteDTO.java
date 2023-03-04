@@ -3,11 +3,13 @@ package com.course.webproject.dto;
 import java.io.Serializable;
 
 import com.course.webproject.domain.Cliente;
+import com.course.webproject.services.validation.ClientUpdate;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
+@ClientUpdate
 public class ClienteDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
