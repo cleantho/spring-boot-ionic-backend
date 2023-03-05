@@ -5,6 +5,8 @@ import java.util.Objects;
 
 import com.course.webproject.domain.enums.Status;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -16,6 +18,11 @@ import jakarta.persistence.OneToOne;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = PagamentoComCartao.class, name = "pagamentoComCartao"),
+    @JsonSubTypes.Type(value = PagamentoComBoleto.class, name = "pagamentoComBoleto")
+})
 public abstract class Pagamento implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
