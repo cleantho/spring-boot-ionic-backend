@@ -1,26 +1,44 @@
 package com.course.webproject.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.course.webproject.security.JwtAuthenticationFilter;
+import com.course.webproject.security.JwtUtil;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	private static final String PUBLIC_MATCHER = "/h2-console/**";
 	private static final String[] PUBLIC_MATCHERS_GET = { "/produtos/**", "/categorias/**" };
 
+	private AuthenticationConfiguration configuration;
+	
+	public SecurityConfig(AuthenticationConfiguration configuration) {
+		this.configuration = configuration;
+	} 
+	
 	// Releasing access to h2-console
 	@Bean
 	WebSecurityCustomizer webSecurityCustomizer() {
@@ -30,14 +48,23 @@ public class SecurityConfig {
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable();
-		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.authorizeHttpRequests((authorize) -> authorize
-				.requestMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET).permitAll()						
+				.requestMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET).permitAll()
 				.anyRequest().authenticated());
 		// Form login handles the redirect to the login page from the
 		// authorization server filter chain
 		// .formLogin(Customizer.withDefaults());
+		http.addFilter(new JwtAuthenticationFilter(configuration.getAuthenticationManager(), jwtUtil));
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		return http.build();
+	}
+
+	@Bean
+	AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder,
+			UserDetailsService userDetailsService) throws Exception {
+		return http.getSharedObject(AuthenticationManagerBuilder.class)
+				.userDetailsService(userDetailsService)
+				.passwordEncoder(passwordEncoder).and().build();
 	}
 
 	@Bean
@@ -48,7 +75,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	BCryptPasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
