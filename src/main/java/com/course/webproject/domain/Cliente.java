@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.course.webproject.domain.enums.Perfil;
 import com.course.webproject.domain.enums.Pessoa;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -15,6 +17,7 @@ import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,7 +39,11 @@ public class Cliente implements Serializable {
 	
 	@JsonIgnore
 	private String senha;
-
+	
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "PERFIL")
+	private Set<Integer> perfis = new HashSet<>();
+	
 	@OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
 	private List<Endereco> enderecos = new ArrayList<>();
 
@@ -50,6 +57,7 @@ public class Cliente implements Serializable {
 
 	public Cliente() {
 		super();
+		addPerfis(Perfil.CLIENTE);
 	}
 
 	public Cliente(Integer id, String nome, String email, String cpfOuCnpj, Pessoa tipo, String senha) {
@@ -108,6 +116,14 @@ public class Cliente implements Serializable {
 
 	public void setSenha(String senha) {
 		this.senha = senha;
+	}
+	
+	public Set<Perfil> getPerfis() {
+		return perfis.stream().map(p -> Perfil.toEnum(p)).collect(Collectors.toSet());
+	}
+
+	public void addPerfis(Perfil perfil) {
+		perfis.add(perfil.getCod());
 	}
 
 	public List<Endereco> getEnderecos() {
