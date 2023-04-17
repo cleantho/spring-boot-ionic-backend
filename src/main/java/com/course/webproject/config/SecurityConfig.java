@@ -21,11 +21,15 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.course.webproject.security.JwtAuthenticationFilter;
+import com.course.webproject.security.JwtAuthorizationFilter;
 import com.course.webproject.security.JwtUtil;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+	
+	@Autowired
+	private UserDetailsService userDetailsService;
 	
 	@Autowired
 	private JwtUtil jwtUtil;
@@ -55,6 +59,7 @@ public class SecurityConfig {
 		// authorization server filter chain
 		// .formLogin(Customizer.withDefaults());
 		http.addFilter(new JwtAuthenticationFilter(configuration.getAuthenticationManager(), jwtUtil));
+		http.addFilter(new JwtAuthorizationFilter(configuration.getAuthenticationManager(), jwtUtil, userDetailsService));
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		return http.build();
 	}
