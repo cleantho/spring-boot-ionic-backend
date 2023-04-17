@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -26,6 +27,7 @@ import com.course.webproject.security.JwtUtil;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(jsr250Enabled = true)
 public class SecurityConfig {
 	
 	@Autowired
@@ -36,6 +38,7 @@ public class SecurityConfig {
 
 	private static final String PUBLIC_MATCHER = "/h2-console/**";
 	private static final String[] PUBLIC_MATCHERS_GET = { "/produtos/**", "/categorias/**" };
+	private static final String[] PUBLIC_MATCHERS_POST = { "/clientes/**" };
 
 	private AuthenticationConfiguration configuration;
 	
@@ -53,6 +56,7 @@ public class SecurityConfig {
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable();
 		http.authorizeHttpRequests((authorize) -> authorize
+				.requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
 				.requestMatchers(HttpMethod.GET, PUBLIC_MATCHERS_GET).permitAll()
 				.anyRequest().authenticated());
 		// Form login handles the redirect to the login page from the

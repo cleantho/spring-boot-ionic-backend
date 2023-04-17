@@ -23,6 +23,7 @@ import com.course.webproject.dto.ClienteDTO;
 import com.course.webproject.dto.ClienteNewDTO;
 import com.course.webproject.services.ClienteService;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 
 @RestController
@@ -32,6 +33,7 @@ public class ClienteResource {
 	@Autowired
 	private ClienteService service;
 
+	@RolesAllowed("ADMIN")
 	@GetMapping
 	public ResponseEntity<List<ClienteDTO>> findAll() {
 		List<Cliente> list = service.findAll();
@@ -39,6 +41,7 @@ public class ClienteResource {
 		return ResponseEntity.ok().body(listDto);
 	}
 	
+	@RolesAllowed("ADMIN")
 	@GetMapping(value = "/page")
 	public ResponseEntity<Page<ClienteDTO>> findPage(
 			@RequestParam(value = "page", defaultValue = "0") Integer page, 
@@ -72,6 +75,7 @@ public class ClienteResource {
 		return ResponseEntity.noContent().build();
 	}
 	
+	@RolesAllowed("ADMIN")
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
 		service.delete(id);
