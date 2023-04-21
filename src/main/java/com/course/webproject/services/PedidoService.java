@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.course.webproject.domain.Cliente;
@@ -14,6 +17,8 @@ import com.course.webproject.domain.enums.Status;
 import com.course.webproject.repositories.ItemPedidoRepository;
 import com.course.webproject.repositories.PagamentoRepository;
 import com.course.webproject.repositories.PedidoRepository;
+import com.course.webproject.security.UserSS;
+import com.course.webproject.services.exceptions.AuthorizationException;
 import com.course.webproject.services.exceptions.ObjectNotFoundException;
 
 import jakarta.transaction.Transactional;
@@ -42,6 +47,16 @@ public class PedidoService {
 		Optional<Pedido> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! Id: " + id + ", Tipo: " + Cliente.class.getName()));
+	}
+	
+	public Page<Pedido> findPage(Integer page, Integer linesPerPage, String direction, String orderBy){
+		UserSS user = UserService.authenticated();
+		if(user == null) {
+			throw new AuthorizationException("Acesso negado!");
+		}
+		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
+		Cliente cliente = clienteService.find(user.getId());
+		return repo.findByCliente(cliente, pageRequest);
 	}
 
 	@Transactional
