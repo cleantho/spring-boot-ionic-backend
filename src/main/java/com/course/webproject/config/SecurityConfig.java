@@ -38,7 +38,7 @@ public class SecurityConfig {
 
 	private static final String PUBLIC_MATCHER = "/h2-console/**";
 	private static final String[] PUBLIC_MATCHERS_GET = { "/produtos/**", "/categorias/**" };
-	private static final String[] PUBLIC_MATCHERS_POST = { "/clientes/**", "/auth/forgot/**" };
+	private static final String[] PUBLIC_MATCHERS_POST = { "/clientes", "/clientes/picture", "/auth/forgot/**" };
 
 	private AuthenticationConfiguration configuration;
 	
