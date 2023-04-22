@@ -54,16 +54,6 @@ public class Cliente implements Serializable {
 	@OneToMany(mappedBy = "cliente")
 	@JsonIgnore
 	private List<Pedido> pedidos = new ArrayList<>();
-	
-	private String imageurl;
-	
-	public String getImageurl() {
-		return imageurl;
-	}
-
-	public void setImageurl(String imageurl) {
-		this.imageurl = imageurl;
-	}
 
 	public Cliente() {
 		super();
