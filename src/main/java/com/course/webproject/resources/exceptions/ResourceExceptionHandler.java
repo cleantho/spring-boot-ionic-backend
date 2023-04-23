@@ -24,53 +24,53 @@ public class ResourceExceptionHandler {
 	
 	@ExceptionHandler(ObjectNotFoundException.class)
 	public ResponseEntity<StandardError> objectNotFound(ObjectNotFoundException e, HttpServletRequest request) {
-		StandardError err = new StandardError(Instant.now(), HttpStatus.NOT_FOUND.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() , e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND.getReasonPhrase() , e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
 	}
 	
 	@ExceptionHandler(DataIntegrityException.class)
 	public ResponseEntity<StandardError> dataIntegrity(DataIntegrityException e, HttpServletRequest request) {
-		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() , e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase() + " - Integridade de dados" , e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<StandardError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
-		ValidationError err = new ValidationError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() , "Erro de validação", request.getRequestURI());
+		ValidationError err = new ValidationError(Instant.now(), HttpStatus.UNPROCESSABLE_ENTITY.value(), HttpStatus.UNPROCESSABLE_ENTITY.getReasonPhrase() + " - Erro de validação" , e.getMessage(), request.getRequestURI());
 		for(FieldError x : e.getFieldErrors()) {
 			err.addError(x.getField(), x.getDefaultMessage());
 		}
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err);
 	}
 	
 	@ExceptionHandler(AuthorizationException.class)
 	public ResponseEntity<StandardError> authorizationException(AuthorizationException e, HttpServletRequest request) {
-		StandardError err = new StandardError(Instant.now(), HttpStatus.FORBIDDEN.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() , e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase() , e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(err);
 	}
 	
 	@ExceptionHandler(FileException.class)
 	public ResponseEntity<StandardError> file(FileException e, HttpServletRequest request) {
-		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() , e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase() + " - Erro de arquivo", e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
 	
 	@ExceptionHandler(AmazonServiceException.class)
 	public ResponseEntity<StandardError> amazonService(AmazonServiceException e, HttpServletRequest request) {
 		HttpStatus code = HttpStatus.valueOf(e.getErrorCode());
-		StandardError err = new StandardError(Instant.now(), code.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() , e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), code.value(), code.getReasonPhrase() + " - Erro Amazon Service", e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(code).body(err);
 	}
 	
 	@ExceptionHandler(AmazonClientException.class)
 	public ResponseEntity<StandardError> amazonClient(AmazonClientException e, HttpServletRequest request) {
-		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() , e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase() + " - Erro Amazon Client" , e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
 	
 	@ExceptionHandler(AmazonS3Exception.class)
 	public ResponseEntity<StandardError> amazonS3(AmazonS3Exception e, HttpServletRequest request) {
-		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() , e.getMessage(), request.getRequestURI());
+		StandardError err = new StandardError(Instant.now(), HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase() + " - Erro S3" , e.getMessage(), request.getRequestURI());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
 	}
 }
